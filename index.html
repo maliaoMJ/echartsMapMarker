@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>地图标记</title>
+	<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.css">
+	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.0.1/css/bootstrap.css">
+	<style type="text/css">
+		*{
+			padding:0px;
+			margin:0px;
+		}
+		body{
+			min-height: 600px;
+			min-width: 1200px;
+			background:url(./4.jpg);
+			background-size: 100% 100%;
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+
+
+
+		}
+
+		#map{
+		 height:380px;
+
+
+		}
+		.jumbotron{
+			wdith:100%;
+			height:100%;
+
+			padding:0px;
+			margin-top:20px;
+		}
+		#title{
+
+			margin-bottom:20px;
+			font-family:'隶书';
+			color:white;
+			padding-left:200px;
+			height:100%;
+			line-height: 50px;
+		}
+		#titleBox{
+			wdith:100%;
+			height:50px;
+			background:black;
+			margin-bottom: 40px;
+
+		}
+		#footer{
+             height:70px;
+			background:black;
+			position:fixed;
+			left:0px;
+			bottom:0px;
+			width:100%;
+			text-align: center;
+		}
+		#footer p{
+			display: inline-block;
+			margin-top:10px;
+
+			color:white;
+			font-size:12px;
+		}
+		#footer .icons{
+			margin-top:10px;
+
+		}
+		#footer .icons a {
+			display:inline-block;
+			color:white;
+			width:100px;
+			text-align: center;
+
+		}
+		#footer .icons a i {
+			display:inline-block;
+			color:white;
+			width:24px;
+			text-align: center;
+			font-size:24px;
+            transition-duration: 0.5s;
+			-webkit-border-radius:24px;
+			-moz-border-radius:24px;
+			border-radius:24px;
+
+
+		}
+		#footer .icons a i:hover{
+			color:red;
+			background:white;
+		}
+		.page_wechat{
+			width:500px;
+			height: 300px;
+			position:absolute;
+			top:50%;
+			left:50%;
+			margin-left:-250px;
+			margin-top:-200px;
+			background:rgba(0,0,0,0.8);
+			z-index:666;
+			display: none;
+			text-align: center;
+
+		}
+		.page_wechat .wechatImg{
+
+			position:absolute;
+			top:50px;
+			left:150px;
+		}
+		.page_wechat img{
+			width:200px;
+			height:200px;
+		}
+		.closeBox{
+			width:200px;
+			height:200px;
+			position:absolute;
+			top:260px;
+			left:150px;
+		}
+		.page_wechat p{
+			color:white;
+			padding-top:20px;
+		}
+
+	</style>
+</head>
+
+<body>
+	<div id="titleBox">
+		<p class="h1" id="title"> <i class="glyphicon glyphicon-map-marker"></i> Mark Map</p>
+	</div>
+     <div class="container">
+
+     </div>
+	 <div class="container">
+	 	 <div class="row">
+	 	 	<div class="col-xs-8 col-xs-offset-2">
+	 	 	 <div class="form-group">
+			    <div class="input-group">
+			      <input type="text" class="form-control" id="serachPlace" placeholder="请您填写详细的地址">
+			      <div class="input-group-addon " id="searh" style="background: black;"><span style="color:white;" class="glyphicon glyphicon-search"></span></div>
+			    </div>
+	         </div>
+	 	    </div>
+	 	 </div>
+	 </div>
+	<div class="container">
+		<div class="row">
+
+			<div class="col-xs-8 col-xs-offset-2" >
+				<div class="jumbotron" id="map">
+
+					</div>
+			</div>
+		</div>
+	</div>
+<div class="container " id="footer">
+	<div class="row">
+		 <div class="col-xs-8 col-xs-offset-2" >
+
+			 <div class="icons">
+
+				 <a href="https://github.com/maliaoMJ" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+				 <a href="javascript:void(0);"><i id="wechat" class="fa fa-wechat" aria-hidden="true"></i> </a>
+				 <a href="http://weibo.com/login.php"><i class="fa fa-weibo" aria-hidden="true"></i></a>
+				 <a href="https://www.baidu.com"><i class="fa fa-paw" aria-hidden="true"></i></a>
+			 </div>
+			 <p>Copyright ©2017  Powered By Kael Version 1.0.0 </p>
+		 </div>
+	</div>
+</div>
+<!--wechat-->
+	<div class="page_wechat">
+		<p class="h4">我的微信</p>
+		<div class="wechatImg">
+			<img src="wechat.png" alt="wechat IMG">
+		</div>
+		<div class="closeBox">
+			<button id="close" class="btn btn-danger">我知道了</button>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="js/echarts.js"></script>
+<script type="text/javascript" src="js/china.js"></script>
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.0.2/jquery.js"></script>
+<script type="text/javascript" src="https://cdn.bootcss.com/bootstrap/3.0.1/js/bootstrap.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+        //全局变量
+		var lng=0;
+		var lat=0;
+        var place='';
+
+       var positions=[];
+        getMap(113.1958096655408,33.77558324513975,'河南城建学院');
+        $('#wechat').on('click',function(){
+           $('.page_wechat').toggle('1s');
+		});
+        $('#close').on('click',function(){
+            $('.page_wechat').toggle('1s');
+		});
+        $('#searh').on('click',function(){
+			var serachPlace=$('#serachPlace');
+	         place =serachPlace.val();
+			if(serachPlace.val()==''){
+                 alert('please input you what search place !');
+			}else{
+				//ajax
+				$.ajax({
+					ttype:'get',
+				    url:'//api.map.baidu.com/geocoder/v2/?callback=renderOption&output=json&address='+serachPlace.val()+'&ak=WDpxoOxq3Y0WRybA9MdM0luwhGyNcQTE',
+				    dataType:'jsonp',
+				
+					success:function(data){
+                              var data=data.result;
+
+                              let location=data.location;
+                              //jingdu
+                              lng=location.lng;
+                              lat=location.lat;
+                              getMap(lng,lat,place);
+
+                             
+
+					},
+					error:function(err){
+                        console.log('request is error');
+					}
+				});
+			}
+		});
+		//map 地图echarts
+		 function getMap(lng,lat,place){
+             let mymap = document.getElementById('map');
+             let myecharts=echarts.init(mymap);
+             var data = [
+                 {name:place, value:new Date()}
+             ];
+             var geoCoordMap = {
+                 place:[lng,lat]
+             };
+
+             var convertData = function (data) {
+
+				 var res={name:place,value:[lng,lat,120]};
+				 positions.push(res);
+                 console.log(positions);//
+                 return positions;
+             };
+
+             option = {
+                 backgroundColor: '#404a59',
+                 title: {
+                     text: '来标记你的位置吧^_^~',
+                     subtext: '基于您给出的位置定位',
+                     sublink: 'By Kael',
+                     left: 'center',
+                     textStyle: {
+                         color: '#fff'
+                     }
+                 },
+                 tooltip : {
+                     trigger: 'item'
+                 },
+                 legend: {
+                     orient: 'vertical',
+                     y: 'bottom',
+                     x:'right',
+                     data:['Your Position'],
+                     textStyle: {
+                         color: '#fff'
+                     }
+                 },
+                 geo: {
+                     map: 'china',
+                     label: {
+                         emphasis: {
+                             show: false
+                         }
+                     },
+                     roam: true,
+                     itemStyle: {
+                         normal: {
+                             areaColor: '#323c48',
+                             borderColor: '#111'
+                         },
+                         emphasis: {
+                             areaColor: '#fc0308'
+                         }
+                     }
+                 },
+                 series : [
+                     {
+                         name: 'Your Position',
+                         type: 'scatter',
+                         coordinateSystem: 'geo',
+                         data: convertData(data),
+                         symbolSize: function (val) {
+                             return val[2] / 10;
+                         },
+                         label: {
+                             normal: {
+                                 formatter: '{b}',
+                                 position: 'right',
+                                 show: false
+                             },
+                             emphasis: {
+                                 show: true
+                             }
+                         },
+                         itemStyle: {
+                             normal: {
+                                 color: '#ddb926'
+                             }
+                         }
+                     },
+                     {
+                         name: '经纬度',
+                         type: 'effectScatter',
+                         coordinateSystem: 'geo',
+                         data: convertData(data.sort(function (a, b) {
+                             return b.value - a.value;
+                         }).slice(0,1)),
+                         symbolSize: function (val) {
+                             return val[2] / 10;
+                         },
+                         showEffectOn: 'render',
+                         rippleEffect: {
+                             brushType: 'stroke'
+                         },
+                         hoverAnimation: true,
+                         label: {
+                             normal: {
+                                 formatter: '{b}',
+                                 position: 'right',
+                                 show: true
+                             }
+                         },
+                         itemStyle: {
+                             normal: {
+                                 color: '#f4e925',
+                                 shadowBlur: 3,
+                                 shadowColor: '#251a08'
+                             }
+                         },
+                         zlevel: 1
+                     }
+                 ]
+             };
+             myecharts.setOption(option);
+		 }
+	});
+
+
+</script>
+</html>
+
+
